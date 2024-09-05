@@ -688,11 +688,22 @@
                 return prepend + code + append;
         }
 
-        document.getElementById("bypasser").onload = async function (){
-            bypasser = document.getElementById("bypasser")
-            window.pxpcode = (await (await bypasser.contentWindow.fetch("https://raw.githubusercontent.com/prodsexloader/customloadscreen/main/main.js")).text())
-            window.modlist = (await bypasser.contentWindow.fetch("https://pxporigin.gemsvido.workers.dev/mods/all.json"))
-            window.modlistjson = (await (window.modlist).json());
-    </script>
+document.getElementById("bypasser").onload = async function() {
+        try {
+            const bypasser = document.getElementById("bypasser");
+            window.code = await (await bypasser.contentWindow.fetch(window.gamecodeurl)).text();
+            window.guicode = await (await bypasser.contentWindow.fetch("https://pxporigin.gemsvido.workers.dev/cgui/cgui-prod-extension.min.js")).text();
+
+            eval(`${patchCode(window.code)}\n${spotifycode}\nSW.Load.decrementLoadSemaphore();\n${pxpcode}`);
+            eval(window.guicode
+                .replace(/\(0,..\.default\)\(`\$\{..\}\/mods\/all\.json`,\{method:"GET",headers:\[\["sid",..\]\]\}\);/, "window.modlist;")
+                .replace(`return(await fetch`, `return(await document.getElementById("bypasser").contentWindow.fetch`)
+                .replace(/=.\.json\(\)/, "=window.modlistjson")
+            );
+        } catch (ex) {
+            console.log(ex);
+        }
+    };
+</script>
 </body>
 </html>
