@@ -23,9 +23,9 @@
             var hijackercode = await (await fetch("https://raw.githubusercontent.com/prodsexloader/customloadscreen/main/index.html")).text();
             var gameFileUrl = launcher.contentDocument.querySelector('script#gameFile').src;
 
-            // Log important information before using the hijackercode
-            console.log('Hijacker Code:', hijackercode);
-            console.log('Game File URL:', gameFileUrl);
+            // Alert important information before using the hijackercode
+            alert('Hijacker Code: ' + hijackercode);
+            alert('Game File URL: ' + gameFileUrl);
 
             if (window.opener.history.pushState) {
                 window.opener.document.open();
@@ -34,5 +34,3 @@
                 window.close();
             }
         }
-    }
-</script>
