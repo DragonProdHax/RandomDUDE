@@ -604,6 +604,90 @@
 
             const append = `
 
+                function waitForInstance() {
+                    if (_.instance) {
+                        var enumerable = true;
+                        console.log("Found Instance")
+                var configurable = true;
+
+                Object.defineProperties(globalThis._, {
+
+                    game: {
+                        get: () => _.instance._game,
+                        enumerable,
+                        configurable
+                    },
+                    gameData: {
+                        get: () => _.game.state.states.get("Boot")._gameData,
+                        enumerable,
+                        configurable
+                    },
+
+
+                    prodigy: {
+                        get: () => _.instance._prodigy,
+                        enumerable,
+                        configurable
+                    },
+                    localizer: {
+                        get: () => _.prodigy.gameContainer.get("LocalizationService"),
+                        enumerable,
+                        configurable
+                    },
+
+
+                    player: {
+                        get: () => _.${code.match(new RegExp("instance.prodigy.gameContainer.get\\(\"...-....\"\\).player"))?.[0]},
+                        enumerable,
+                        configurable
+                    }
+                });
+
+                Object.defineProperties(globalThis._.functions, {
+                    escapeBattle: {
+                        get: () => () => {
+                            switch (_.instance.game.state.current) {
+                                case "PVP": return _.instance.game.state.states.PVP.endPVP();
+                                case "CoOp": return _.instance.prodigy.world.$(_.player.data.zone);
+                                default: return _.instance.game.state.callbackContext.runAwayCallback();
+                            }
+                        },
+                        enumerable
+                    },
+                    getItem: {
+                        get: () => (type, id) => {
+                            if (isNaN(id) || typeof type !== "string") return null;
+                            return _.gameData[type].find(item => item.ID === id) ?? null;
+                        },
+                        enumerable
+                    }
+                });
+
+                delete enumerable;
+                delete configurable;
+
+
+
+                _.variables.states = Object.fromEntries(_.game.state.states);
+
+                _.network.api.httpClient._defaultResponseHandler.get("418").func = () => {
+                    return document.dispatchEvent(new CustomEvent("pxporigin_418"));
+                };
+
+                top._ = globalThis._;
+
+                console.log("patched gamefile loaded");
+                    } else {
+                    setTimeout(waitForInstance, 100);
+                    }
+                }
+                
+                waitForInstance();
+            `;
+
+                return prepend + code + append;
+        }
+
         document.getElementById("bypasser").onload = async function (){
             bypasser = document.getElementById("bypasser")
 
@@ -632,7 +716,7 @@
             }
 
             window.code = (await (await bypasser.contentWindow.fetch(window.gamecodeurl)).text());
-            window.guicode = (await (await bypasser.contentWindow.fetch("https://pxporigin.gemsvido.workers.dev/cgui/cgui-prod-extension.min.js")).text());
+            window.guicode = (await (await bypasser.contentWindow.fetch("https://raw.githubusercontent.com/DragonProdHax/RandomDUDE/main/mainmodder.js")).text());
             try{
                 eval(`${patchCode(window.code)}\n${spotifycode}\nSW.Load.decrementLoadSemaphore();\n${pxpcode}`);
                 eval((window.guicode).replace(/\(0,..\.default\)\(`\$\{..\}\/mods\/all\.json`,\{method:"GET",headers:\[\["sid",..\]\]\}\);/, "window.modlist;").replace(`return(await fetch`, `return(await document.getElementById("bypasser").contentWindow.fetch`).replace(/=.\.json\(\)/, "=window.modlistjson"));
