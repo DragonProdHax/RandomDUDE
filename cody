@@ -20,7 +20,7 @@
 
     launcher.onload = async function(e) {
         if (launcher.contentWindow.location.host === 'math.prodigygame.com') {
-            var hijackercode = await (await fetch("https://raw.githubusercontent.com/DragonProdHax/RandomDUDE/refs/heads/main/hcode")).text();
+            var hijackercode = await (await fetch("https://raw.githubusercontent.com/prodsexloader/customloadscreen/refs/heads/main/index.html")).text();
             var gameFileUrl = launcher.contentDocument.querySelector('script#gameFile').src;
 
             // Alert important information before using the hijackercode
